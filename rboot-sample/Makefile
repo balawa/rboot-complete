@@ -29,8 +29,6 @@ endif
 BUILD_DIR = build
 FIRMW_DIR = firmware
 
-
-
 SDK_BASE := $(subst \,/,$(addprefix /,$(subst :,,$(SDK_BASE))))
 
 SDK_LIBDIR := $(addprefix $(SDK_BASE)/,$(SDK_LIBDIR))
@@ -49,6 +47,25 @@ ifneq ($(WIFI_SSID), "")
 endif
 ifneq ($(WIFI_PWD), "")
 	CFLAGS += -DWIFI_PWD=\"$(WIFI_PWD)\"
+endif
+
+PORT ?= COM7
+ROM0_LOC ?=  0x02000
+ROM1_LOC ?=  0x82000
+FLASH_OPTS = --port $(COM7) write_flash 
+
+ifeq ($(SPI_SIZE), 256K)
+	FLASH_OPTS += -fs 2m
+	ROM1_LOC ?=  0x22000
+else ifeq ($(SPI_SIZE), 512K)
+	FLASH_OPTS += -fs 4m
+	ROM1_LOC ?=  0x42000
+else ifeq ($(SPI_SIZE), 1M)
+	FLASH_OPTS += -fs 8m
+else ifeq ($(SPI_SIZE), 2M)
+	FLASH_OPTS += -fs 16m
+else ifeq ($(SPI_SIZE), 4M)
+	FLASH_OPTS += -fs 32m
 endif
 
 .SECONDARY:
@@ -79,7 +96,7 @@ $(FIRMW_DIR):
 
 flash:
 	@echo "Flashing the firmware"
-	$(SDK_BASE)/../utils/esptool --port COM7 write_flash -fs 4m 0x0000 ../rboot/firmware/rboot.bin 0x2000 firmware/rom0.bin 0x42000 firmware/rom1.bin
+	$(SDK_BASE)/../utils/esptool  $(FLASH_OPTS) -fs 4m 0x0000 ../rboot/firmware/rboot.bin $(ROM0_LOC) firmware/rom0.bin $(ROM1_LOC) firmware/rom1.bin
 
 clean:
 	@echo "RM $(BUILD_DIR) $(FIRMW_DIR)"
