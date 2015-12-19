@@ -1,0 +1,13 @@
+esptool2/*.o
+esptool2/*.exe
+esptool2/*.user
+esptool2/*.sdf
+esptool2/*.opensdf
+esptool2/*.suo
+esptool2/esptool
+esptool2/Debug
+esptool2/Release
+/esptool2ipch
+esptool2/esptool2
+*/firmware
+*/build
